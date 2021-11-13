@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,7 +36,6 @@ namespace IDistributedCacheRedisApp.Web.Controllers
 
             return View();
         }
-
         public async Task<IActionResult> Show()
         {
             #region ESKİ
@@ -68,6 +68,19 @@ namespace IDistributedCacheRedisApp.Web.Controllers
             }
             ViewBag.mesaj = "Datalar silinmedi.";
             return View();
+        }
+
+        public IActionResult ImageCache()
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/Apple-Car-production-rumors.jpg");
+            byte[] imageByte = System.IO.File.ReadAllBytes(path);
+            _distributedCache.Set("resim",imageByte);
+            return View();
+        }
+        public IActionResult ImageUrl()
+        {
+            byte[] resimbyte = _distributedCache.Get("resim");
+            return File(resimbyte,"image/jpg");
         }
     }
 }
