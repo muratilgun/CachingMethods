@@ -14,24 +14,34 @@ namespace IDistributedCacheRedisApp.Web.Controllers
         {
             _distributedCache = distributedCache;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             DistributedCacheEntryOptions cacheEntryOptions = new DistributedCacheEntryOptions();
             cacheEntryOptions.AbsoluteExpiration = DateTime.Now.AddMinutes(1);
-            _distributedCache.SetString("name", "Murat", cacheEntryOptions); 
+            _distributedCache.SetString("name", "Murat", cacheEntryOptions);
+            await _distributedCache.SetStringAsync("surname", "Niyazi", cacheEntryOptions);
 
             return View();
         }
 
-        public IActionResult Show()
+        public async Task<IActionResult> Show()
         {
             string name = _distributedCache.GetString("name");
+            string surname = await _distributedCache.GetStringAsync("name");
             ViewBag.name = name;
+            ViewBag.surname = surname;
             return View();
         }
         public IActionResult Remove()
         {
             _distributedCache.Remove("name");
+            _distributedCache.Remove("surname");
+            if (_distributedCache.GetString("surname") == null)
+            {
+                ViewBag.mesaj = "Datalar silindi.";
+                return View();
+            }
+            ViewBag.mesaj = "Datalar silinmedi.";
             return View();
         }
     }
