@@ -18,9 +18,5 @@ namespace RedisExchangeAPI.Web.Controllers
             _redisService = redisService;
             db = _redisService.GetDb(1);
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
     }
 }
