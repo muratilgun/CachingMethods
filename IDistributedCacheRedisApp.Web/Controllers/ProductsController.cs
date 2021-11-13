@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace IDistributedCacheRedisApp.Web.Controllers
@@ -25,9 +26,12 @@ namespace IDistributedCacheRedisApp.Web.Controllers
             //_distributedCache.SetString("name", "Murat", cacheEntryOptions);
             //await _distributedCache.SetStringAsync("surname", "Niyazi", cacheEntryOptions); 
             #endregion
-            Product product = new Product { Id = 2, Name = "Kalem2", Price = 100 };
+            Product product = new Product { Id = 4, Name = "Kalem4", Price = 400 };
             string jsonproduct = JsonConvert.SerializeObject(product);
-            await _distributedCache.SetStringAsync("product:2",jsonproduct,cacheEntryOptions);
+
+            Byte[] byteproduct = Encoding.UTF8.GetBytes(jsonproduct);
+            _distributedCache.Set("product:1",byteproduct);
+            //await _distributedCache.SetStringAsync("product:2",jsonproduct,cacheEntryOptions);
 
             return View();
         }
@@ -40,9 +44,17 @@ namespace IDistributedCacheRedisApp.Web.Controllers
             //ViewBag.name = name;
             //ViewBag.surname = surname; 
             #endregion
-            string jsonproduct = await _distributedCache.GetStringAsync("product:1");
+            Byte[] byteProduct = _distributedCache.Get("product:1");
+            string jsonproduct = Encoding.UTF8.GetString(byteProduct);
             Product p = JsonConvert.DeserializeObject<Product>(jsonproduct);
             ViewBag.product = p;
+
+
+            #region ESKİ2
+            //string jsonproduct = await _distributedCache.GetStringAsync("product:1");
+            //Product p = JsonConvert.DeserializeObject<Product>(jsonproduct); 
+            //ViewBag.product = p;
+            #endregion
             return View();
         }
         public IActionResult Remove()
