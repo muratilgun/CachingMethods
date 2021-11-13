@@ -24,23 +24,34 @@ namespace RedisExchangeAPI.Web.Controllers
             HashSet<string> list = new HashSet<string>();
             if (db.KeyExists(listKey))
             {
-                db.SortedSetScan(listKey).ToList().ForEach(x=> 
-                {
-                    list.Add(x.ToString());
-                });
+                //db.SortedSetScan(listKey).ToList().ForEach(x=> 
+                //{
+                //    list.Add(x.ToString());
+                //});
+                db.SortedSetRangeByRankWithScores(listKey, order: Order.Descending).ToList().ForEach(x =>
+                  {
+                      list.Add(x.ToString());
+                  });
+
             }
             return View(list);
         }
 
         [HttpPost]
-        public IActionResult Add(string name,int score)
+        public IActionResult Add(string name, int score)
         {
+            if (name != null)
+                db.SortedSetAdd(listKey, name, score);
             db.KeyExpire(listKey, DateTime.Now.AddMinutes(1));
-            if (name != null )
-                db.SortedSetAdd(listKey,name,score);
 
             return RedirectToAction("Index");
 
+        }
+
+        public IActionResult Delete(string name)
+        {
+            db.SortedSetRemove(listKey, name);
+            return RedirectToAction("Index");
         }
     }
 }
